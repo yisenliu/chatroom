@@ -11,6 +11,9 @@ $ yarn dev
 
 # build for production
 $ yarn build
+
+# run websocket server
+$ yarn server
 ```
 
 ## Technology
