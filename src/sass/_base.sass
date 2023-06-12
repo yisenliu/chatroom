@@ -1,0 +1,235 @@
+// *************************************
+//
+// Google Material Icons
+//
+// *************************************
+@import url('https://fonts.googleapis.com/icon?family=Material+Icons+Outlined&display=swap') 
+// @font-face 
+//   font-family: 'Material Icons'
+//   font-style: normal
+//   font-weight: 400
+//   font-display: swap
+//   src: url(https://fonts.gstatic.com/s/materialicons/v140/flUhRq6tzZclQEJ-Vdg-IuiaDsNc.woff2) format('woff2'), url(https://fonts.gstatic.com/s/materialicons/v140/flUhRq6tzZclQEJ-Vdg-IuiaDsNa.woff) format('woff')
+
+.material-icons
+  @extend %material-icons
+
+
+// *************************************
+//
+// Unicode range
+//
+// *************************************  
+// 中日韓-漢字 CJK Unified Ideographs U+4E00-U+9FFF
+@font-face
+  font-family: my-sans-serif
+  src: local(-apple-system), local(BlinkMacSystemFont), local('Microsoft YaHei UI'), local('Microsoft YaHei'), local('Microsoft JhengHei')
+  unicode-range: U+4E00-9FFF
+  font-display: swap // Avoid invisible text during font loading
+
+@font-face
+  font-family: my-serif
+  src: local(-apple-system), local(BlinkMacSystemFont),local(PMingLiU), local('LiSong Pro'), local('Kozuka Mincho Pro'), local('MS Mincho')
+  unicode-range: U+4E00-9FFF
+  font-display: swap
+
+// 日文 Japanese Kana U+3040-U+30FF
+@font-face
+  font-family: my-sans-serif
+  src: local(Meiryo), local('游ゴシック Medium'), local('Kozuka Gothic Pro'), local('Hiragino Kaku Gothic Pro')
+  unicode-range: U+3040-30FF
+  font-display: swap
+
+@font-face
+  font-family: my-serif
+  src: local('Kozuka Mincho Pro'), local('Hiragino Mincho Pro'), local('MS Mincho')
+  unicode-range: U+3040-30FF
+  font-display: swap
+
+// 注音符號 Bopomofo U+3105-U+312C
+@font-face
+  font-family: my-sans-serif
+  src: local('Microsoft YaHei UI'), local('Microsoft YaHei'), local('Microsoft JhengHei UI'), local('Microsoft JhengHei'), local('LiHei Pro')
+  unicode-range: U+3105-312C
+  font-display: swap
+
+@font-face
+  font-family: my-serif
+  src: local(-apple-system), local(BlinkMacSystemFont),local(PMingLiU), local('LiSong Pro')
+  unicode-range: U+3105-312C
+  font-display: swap
+
+// 拉丁文 Latin, Latin1, Latin Ext-A, Latin Ext-B
+@font-face
+  font-family: my-sans-serif
+  src: local(-apple-system), local(BlinkMacSystemFont), local('Segoe UI'), local(Roboto), local(Ubuntu), local('Helvetica Neue'), local(Helvetica), local(Arial)
+  unicode-range: U+00-024F
+  font-display: swap
+
+@font-face
+  font-family: my-serif
+  src: local(-apple-system), local(BlinkMacSystemFont),local(Georgia), local('Times New Roman'), local(Times)
+  unicode-range: U+00-024F
+  font-display: swap
+
+
+// *************************************
+//
+// Normalize
+//
+// *************************************  
+*,
+::before,
+::after
+  // 允許背景列印
+  print-color-adjust: exact
+
+html
+  font-size: 16px
+  line-height: 1.5
+  -webkit-text-size-adjust: 100%
+  @apply font-mySans text-gray-800 antialiased
+  +sm
+    --device: 'mobile'
+  +md
+    --device: 'tablet'
+  +lg
+    --device: 'desktop'
+
+body
+  text-rendering: optimizeLegibility
+  -webkit-tap-highlight-color: rgba(0,0,0,0)
+  @apply min-h-screen bg-white
+
+a
+  &:link
+    @apply text-blue-600
+  &:visited
+    @apply text-blue-600
+  &:hover
+    @apply text-blue-500
+  &:active
+    @apply text-blue-700
+
+// Form
+// -------------------------------------
+input,
+optgroup,
+select,
+textarea
+  @apply block w-full rounded-md p-2 text-base m-0 align-baseline font-inherit
+
+button,
+[type="button"],
+[type="reset"],
+[type="submit"]
+  @apply select-none cursor-pointer inline-flex items-center justify-center text-white px-7 py-1 bg-gray-600 no-underline text-xl font-inherit rounded-full border border-solid border-transparent
+  &:hover
+    @apply bg-gray-500
+  &:active
+    @apply bg-gray-700
+  &.disabled,
+  &:disabled,
+  &[disabled]
+    @apply opacity-50 pointer-events-none
+
+input,
+textarea
+  &::placeholder
+    @apply text-blueGray-200
+
+label
+  @apply inline-block
+
+a,
+button,
+input,
+select,
+textarea
+  &:focus
+    outline: none
+
+[type='checkbox'],
+[type='radio']
+  @apply appearance-none inline-block align-middle select-none flex-shrink-0 w-4 h-4 p-0 border-2 border-solid border-gray-500 mr-1 bg-origin-border bg-white bg-center bg-no-repeat bg-0% transition-all duration-200 focus:text-info focus:ring-0
+  &:checked
+    @apply bg-100% border-transparent bg-info
+    + span
+      @apply text-info
+
+[type='checkbox']
+  background-image: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white"%3E%3Cpath d="M0 0h24v24H0z" fill="none"/%3E%3Cpath d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/%3E%3C/svg%3E')
+
+[type='radio']
+  @apply rounded-full
+  background-image: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"%3E%3Ccircle cx="12" cy="12" r="6" fill="white" /%3E%3C/svg%3E')
+
+select,
+textarea,
+input[type="text"],
+input[type="password"],
+input[type="datetime"],
+input[type="datetime-local"],
+input[type="date"],
+input[type="month"],
+input[type="time"],
+input[type="week"],
+input[type="number"],
+input[type="email"],
+input[type="url"],
+input[type="search"],
+input[type="tel"],
+input[type="color"]
+  @apply text-gray-800 bg-white bg-none border border-blueGray-300 block w-full rounded-md p-3 shadow-sm focus:border-info focus:shadow-md focus:ring-2 focus:ring-info focus:ring-opacity-30
+  &[disabled]
+    @apply cursor-not-allowed bg-gray-300 opacity-100 text-gray-400 border-current
+  &[readonly]
+    @apply pointer-events-none text-gray-500 bg-gray-100 opacity-100
+
+select
+  @apply appearance-none bg-white bg-no-repeat
+  background-image: url(~@assets/inline/keyboard_arrow_down.svg)
+  background-position: right .5rem center
+  background-size: 1.5rem
+  &:focus
+    background-image: url(~@assets/inline/keyboard_arrow_up.svg)
+  &[disabled]
+    background-image: url(~@assets/inline/keyboard_arrow_down_disabled.svg)
+
+textarea
+  @apply h-auto resize-y
+
+// Table
+// -------------------------------------
+table
+  @apply w-full my-0 bg-white rounded-lg border-separate border-spacing-0 border border-blueGray-100
+  > caption
+    @apply text-center text-lg font-semibold mb-5 
+  td,
+  th
+    @apply py-3 px-4 text-left
+    
+thead
+  th
+    @apply text-center text-black bg-blueGray-100 font-normal whitespace-nowrap
+    &:first-child
+      @apply rounded-tl-lg
+    &:last-child
+      @apply rounded-tr-lg
+            
+tbody,
+tfoot
+  td,
+  th
+    @apply align-top border-t border-blueGray-100
+
+// Selection Color
+// -------------------------------------
+\:focus
+  @apply outline-none
+
+iframe
+  @apply border-none
+
+::selection
+  @apply bg-primary text-white

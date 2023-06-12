@@ -1,0 +1,29 @@
+:root
+  --swiper-theme-color: #fff
+  --swiper-pagination-bullet-inactive-color: #fff
+  // --chatroom-assistant-bg: theme('colors.cyan.50')
+  // --chatroom-assistant-color: theme('colors.gray.800')
+  // --chatroom-footer-bg: theme('colors.cyan.100')
+  // --chatroom-header-bg: theme('colors.cyan.800')
+  // --chatroom-user-bg: theme('colors.cyan.100')
+  // --chatroom-user-color: #000
+
+#myChatroom
+  #main
+    @apply my-0 mx-auto p-0 min-h-screen w-full max-w-none
+
+#chatSP
+  .swiper
+    @apply flex-1 h-full
+    &-slide
+      @apply flex items-center bg-black    
+      &-active
+        z-index: 1
+    &-zoom-container
+      > *
+        width: 100%
+
+.downloadFile
+  @apply text-0 font-a bg-center bg-no-repeat w-12 h-12 bg-transparent block
+  background-image: url(~@assets/static/icon_file_download.svg)
+  background-size: 30px 30px

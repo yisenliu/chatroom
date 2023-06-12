@@ -1,0 +1,96 @@
+.chatroom
+  @apply flex flex-col py-15 overflow-hidden w-screen h-screen
+  &--disconnected,
+  &--error
+    @apply relative
+    &::before
+      @apply sticky z-1 left-0 top-0 w-full text-center p-2 animate-appear
+  &--disconnected
+    &::before
+      @apply bg-gray-900 text-white
+      content: '連線已終止'
+  &--error
+    &::before
+      @apply bg-red-900 text-white
+      content: '連線失敗'
+  &-body
+    @apply flex-1 space-y-6 overflow-auto p-4 overscroll-contain
+  &-dialog
+    @apply flex
+    &.assistant
+      @apply mr-4
+      &::before
+        content: ''
+        @apply w-12 h-12 bg-white bg-center bg-contain bg-no-repeat block flex-shrink-0 flex-grow-0
+        background-image: url(~@assets/static/avatar.svg)
+      .chatroom-dialog-plaintext
+        @apply ml-4
+        $bg: var(--chatroom-assistant-bg,theme('colors.blueGray.50'))
+        background-color: $bg
+        color: var(--chatroom-assistant-color, theme('colors.gray.800'))
+        &::before
+          @apply -scale-x-100 left-auto right-full skew-y-6
+          border-color: $bg transparent transparent $bg
+    &.user
+      @apply ml-4 flex-row-reverse
+      time
+        @apply text-right
+    time
+      @apply text-gray-500 text-xs self-end mx-1 leading-tight
+      width: 6em
+    &-avatar
+      @apply w-12 h-12 bg-white bg-center bg-no-repeat rounded-full block
+    &-media
+      @apply grid gap-px mx-1
+      max-width: max(70vw,300px)
+      grid-template-columns: repeat(2, minmax(50%,1fr))
+      grid-template-rows: auto
+      > *
+        @apply flex rounded-lg w-full h-full
+        &:last-child:nth-child(2n+1)
+          @apply col-span-full
+      > img
+        @apply object-cover
+    &-plaintext
+      @apply p-2 rounded-lg shadow-sm mx-1 relative
+      $bg: var(--chatroom-user-bg,theme('colors.blue.100'))
+      background-color: $bg
+      color: var(--chatroom-user-color, #000)
+      &::before
+        @apply absolute z-1 left-full top-3 w-0 h-0 -skew-y-12
+        content: ''
+        border-width: .7rem .5rem 0 0
+        border-style: solid
+        border-color: $bg transparent transparent transparent
+  &-footer
+    @apply flex items-center px-4 py-2 bg-blueGray-100 fixed z-1 w-full h-15 left-0 bottom-0
+    background-color: var(--chatroom-footer-bg,theme('colors.blueGray.100'))
+    &-label
+      @apply w-12 h-12 flex justify-center items-center -ml-4
+      &::before
+        +md-icon(attach_file)
+        @apply text-2xl leading-none
+      input
+        @apply hidden      
+    &-msgInput
+      @apply flex-1
+      @apply py-2 border-none rounded-full focus:ring-0 focus:shadow-none #{!important}
+  &-header   
+    @apply grid grid-flow-col w-full h-15 fixed z-2 left-0 top-0 text-xl text-white
+    grid-template-columns: repeat(3, minmax(3rem,1fr))
+    background-color: var(--chatroom-header-bg,theme('colors.blueGray.400'))
+    &-close
+      @apply w-16 text-0 justify-self-end flex justify-center items-center
+      grid-column: 3/4
+      &::before
+        +md-icon(close)
+        @apply text-2xl
+    &-title
+      @apply flex justify-center items-center whitespace-nowrap
+      grid-column: 2/3
+      &::before
+        +md-icon(textsms)
+        @apply mr-1
+        // content: ''
+        // @apply mr-1 w-6 h-6 block bg-center bg-contain bg-no-repeat
+        // background-image: url(~@assets/static/icon_textsms.svg)

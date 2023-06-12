@@ -1,0 +1,37 @@
+$h: px2rem(50)
+
+.slidePage
+  @apply w-full h-full translate-x-0 transition-transform ease-in-out fixed z-999 top-0 left-full
+  background-color: var(--slidePage-bg,theme('colors.black'))
+  &::after
+    content: ''
+    @apply block w-full h-full bg-white absolute -z-1 left-0 top-full
+  &.active
+    @apply -translate-x-full
+  &-body
+    @apply overflow-scroll flex items-center
+    height: calc(100% - #{$h})
+  &--open
+    @apply overflow-hidden
+  &-head
+    @apply grid grid-flow-col w-full sticky z-5 left-0 top-0 text-xl text-white
+    background-color: var(--slidePage-head-bg,theme('colors.black'))
+    grid-template-columns: repeat(3, minmax(3rem,1fr))
+    height: $h
+    > a
+      @apply text-current
+    &-left
+      @apply text-0 cursor-pointer text-center h-full flex justify-center items-center
+      width: $h
+      grid-column: 1/2
+      &::before
+        @apply text-4xl text-white
+        +md-icon(chevron_left)
+    &-middle
+      @apply text-center whitespace-nowrap
+      $val: $h * 2
+      line-height: $h      
+      grid-column: 2/3
+    &-right
+      @apply text-right leading-none justify-self-end
+      grid-column: 3/4

@@ -1,0 +1,17 @@
+@import abstracts
+@import '@components/pace/style.sass'
+
+// Tailwind css
+// -------------------------------------
+@tailwind base
+@tailwind components
+@tailwind utilities
+@tailwind variants
+
+@layer base
+  @import base
+  
+// 只載入必要的元件，非每頁共用的元件(如：modal, tab, form...)由各頁 entry 負責 import
+@layer components  
+  @import layout
+  
