@@ -43,7 +43,6 @@ module.exports = () => {
       }),
       ...plugins.MultiHtmlWebpackPlugins(),
     ],
-    // target設為'web'以外的值都會讓HMR失效，靜待webpack-dev-server改版修正。
     target: 'web',
   });
 };

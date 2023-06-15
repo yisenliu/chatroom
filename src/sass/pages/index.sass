@@ -1,12 +1,12 @@
 :root
   --swiper-theme-color: #fff
   --swiper-pagination-bullet-inactive-color: #fff
-  // --chatroom-assistant-bg: theme('colors.cyan.50')
-  // --chatroom-assistant-color: theme('colors.gray.800')
-  // --chatroom-footer-bg: theme('colors.cyan.100')
-  // --chatroom-header-bg: theme('colors.cyan.800')
-  // --chatroom-user-bg: theme('colors.cyan.100')
-  // --chatroom-user-color: #000
+  --chatroom-assistant-bg: theme('colors.cyan.50')
+  --chatroom-assistant-color: theme('colors.gray.800')
+  --chatroom-footer-bg: theme('colors.cyan.100')
+  --chatroom-header-bg: theme('colors.cyan.800')
+  --chatroom-user-bg: theme('colors.cyan.100')
+  --chatroom-user-color: #000
 
 #myChatroom
   #main
@@ -27,3 +27,8 @@
   @apply text-0 font-a bg-center bg-no-repeat w-12 h-12 bg-transparent block
   background-image: url(~@assets/static/icon_file_download.svg)
   background-size: 30px 30px
+
+.portal
+  @apply my-4 p-4 rounded-lg bg-gray-100 relative flex flex-col space-y-4 justify-center
+  button
+    @apply bg-cyan-500 hover:bg-cyan-400

@@ -1,5 +1,7 @@
 .chatroom
-  @apply flex flex-col py-15 overflow-hidden w-screen h-screen
+  @apply hidden flex-col py-15 overflow-hidden w-screen h-screen  fixed w-full h-full z-5 left-0 top-0 bg-white
+  &--connected
+    @apply flex
   &--disconnected,
   &--error
     @apply relative
@@ -40,7 +42,7 @@
       width: 6em
     &-avatar
       @apply w-12 h-12 bg-white bg-center bg-no-repeat rounded-full block
-    &-media
+    &-attachment
       @apply grid gap-px mx-1
       max-width: max(70vw,300px)
       grid-template-columns: repeat(2, minmax(50%,1fr))
@@ -76,21 +78,14 @@
       @apply flex-1
       @apply py-2 border-none rounded-full focus:ring-0 focus:shadow-none #{!important}
   &-header   
-    @apply grid grid-flow-col w-full h-15 fixed z-2 left-0 top-0 text-xl text-white
-    grid-template-columns: repeat(3, minmax(3rem,1fr))
+    @apply grid grid-cols-4 grid-flow-col items-center w-full h-15 fixed z-2 left-0 top-0 text-xl text-white
     background-color: var(--chatroom-header-bg,theme('colors.blueGray.400'))
     &-close
-      @apply w-16 text-0 justify-self-end flex justify-center items-center
-      grid-column: 3/4
+      @apply w-16 text-0 justify-self-end flex justify-center items-center cursor-pointer
+      grid-column: 4/5
       &::before
         +md-icon(close)
         @apply text-2xl
     &-title
-      @apply flex justify-center items-center whitespace-nowrap
-      grid-column: 2/3
-      &::before
-        +md-icon(textsms)
-        @apply mr-1
-        // content: ''
-        // @apply mr-1 w-6 h-6 block bg-center bg-contain bg-no-repeat
-        // background-image: url(~@assets/static/icon_textsms.svg)
+      @apply justify-self-center whitespace-nowrap
+      grid-column: 2/4

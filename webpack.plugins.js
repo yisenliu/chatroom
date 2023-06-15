@@ -2,6 +2,7 @@ const Dotenv = require('dotenv-webpack');
 const fs = require('fs');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const isDev = process.env.NODE_ENV === 'development';
+const myPackage = require('./package.json');
 const path = require('path');
 const resolve = file_or_dir => path.resolve(__dirname, file_or_dir);
 const PATHS = {
@@ -35,7 +36,7 @@ const plugins = {
     // 不用透過 JSON.stringify() 來完成予值, 必須透過 process.env.KEY 取得變數值
     return new webpack.EnvironmentPlugin({
       development: isDev,
-      breakpoints: JSON.parse(process.env.npm_package_config_breakpoints),
+      breakpoints: myPackage.config.breakpoints,
     });
   },
   MultiHtmlWebpackPlugins: () => {
@@ -53,12 +54,7 @@ const plugins = {
   },
   WebpackProvidePlugin: () => {
     return new webpack.ProvidePlugin({
-      // anime: 'animejs/lib/anime.js',
       app: resolve('src/app.js'),
-      // axios: 'axios',
-      // React: 'react',
-      // Vue: 'vue/dist/vue.js',
-      // Waypoint: ['waypoints/lib/noframework.waypoints.js', 'waypoints/lib/shortcuts/inview.js']
     });
   },
 };

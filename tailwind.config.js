@@ -1,9 +1,9 @@
-const myColors = require('./src/lib/tailwindcss/colors.js');
+const myColors = require('./src/lib/colors.js');
+const myPackage = require('./package.json');
 const px2rem = function (pxValue) {
   return `${pxValue / 16}rem`;
 };
-// const breakpoints = [768, 1024];
-const breakpoints = JSON.parse(process.env.npm_package_config_breakpoints);
+const breakpoints = myPackage.config.breakpoints;
 console.log('\x1b[36m%s\x1b[0m', `Load TailwindCSS`);
 
 module.exports = {

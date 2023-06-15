@@ -4,12 +4,18 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" type="image/svg+xml" href="./assets/avatar.svg" />
-    <title>一對一聊天</title>
+    <title>聊天室</title>
   </head>
   <body>
+    <div id="container">
+      <div class="portal">
+        <input type="text" name="" id="username" placeholder="請輸入您的名字" value="" />
+        <button type="button">開始對話</button>
+      </div>
+    </div>
     <div class="chatroom" id="myChatroom">
       <div class="chatroom-header">
-        <h3 class="chatroom-header-title">一對一聊天</h3>
+        <h3 class="chatroom-header-title">與Assistant對話</h3>
         <span class="chatroom-header-close">Close</span>
       </div>
       <div class="chatroom-body"></div>
@@ -20,7 +26,7 @@
         <input type="text" class="chatroom-footer-msgInput" placeholder="請輸入訊息" />
       </div>
     </div>
-    <div class="slidePage" id="chatSP">
+    <div class="slidePage" id="gallerySP">
       <div class="slidePage-head">
         <div class="slidePage-head-left">返回</div>
         <div class="slidePage-head-right">

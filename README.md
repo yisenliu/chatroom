@@ -21,11 +21,11 @@ $ yarn server
 - Webpack 5
 - Tailwind CSS 3 / SASS / PostCSS
 - Vanilla Javascript ES6+
-- Websocket
+- socket.io
 
 ## Features
 
-- Websocket 連線，實現雙向即時溝通。
+- socket.io 連線，實現雙向即時溝通。
 - 支援純文字對話、圖片、影片上傳，其中圖片與影片在上傳後以 blob 呈現在頁面上，無需等待上傳 server 取得 url 即可預覽。
 - 使用 MutationObserver 監視對話框節點，一有新增對話，立刻將畫面捲至該處。
 - 點擊對話框內的縮圖可直接看大圖，雙擊大圖可縮放，如果是多張圖片，則由對應的大圖開始輪播。

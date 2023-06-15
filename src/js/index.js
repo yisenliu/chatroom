@@ -11,9 +11,24 @@ import 'swiper/css/pagination';
 import 'swiper/css/zoom';
 
 // console.log(process.env.OPENAI_APIKEY);
+let myChatroom;
+// portal
+const user = document.querySelector('.portal input');
+const btnStartChat = document.querySelector('.portal button');
+function enterChatroom() {
+  const username = user.value || 'Guest';
+  myChatroom = new Chatroom({ id: 'myChatroom', username });
+  myChatroom.connect();
+  user.value = '';
+}
+btnStartChat.addEventListener('click', enterChatroom);
+user.addEventListener('keydown', event => {
+  if (event.key === 'Enter') {
+    enterChatroom();
+  }
+});
 
-const chatSP = new SlidePage('chatSP');
-const myChatroom = new Chatroom('myChatroom');
+const gallerySP = new SlidePage('gallerySP');
 
 // 檔案上傳
 const fileUploader = document.getElementById('fileUploader');
@@ -24,7 +39,7 @@ fileUploader.addEventListener('change', e => {
 // 圖片輪播與下載 (https://swiperjs.com/swiper-api)
 let mySwiper = null;
 let slideIdx = 0;
-const chatSPBody = chatSP.body;
+const gallerySPBody = gallerySP.body;
 const downloadFile = document.querySelector('.downloadFile');
 function changeDownloadURL(slideIdx) {
   downloadFile.href = mySwiper.slides[slideIdx].querySelector('img').src;
@@ -38,12 +53,12 @@ function createSwiper(elements) {
     return (
       acc +
       `
-          <div class="swiper-slide">
-            <div class="swiper-zoom-container">
-              ${el.outerHTML}
-            </div>
+        <div class="swiper-slide">
+          <div class="swiper-zoom-container">
+            ${el.outerHTML}
           </div>
-        `
+        </div>
+      `
     );
   }, '');
   let swiperHtml = `
@@ -57,8 +72,8 @@ function createSwiper(elements) {
         </div>
       `;
 
-  chatSPBody.replaceChildren();
-  chatSPBody.insertAdjacentHTML('afterbegin', swiperHtml);
+  gallerySPBody.replaceChildren();
+  gallerySPBody.insertAdjacentHTML('afterbegin', swiperHtml);
   return new Swiper('.swiper', {
     modules: [Navigation, Pagination, Zoom],
     navigation: {
@@ -93,10 +108,12 @@ chatroomBody.addEventListener(
       }
       mySwiper = createSwiper(mediaElements);
       slideIdx = mediaElements.indexOf(self);
-      chatSP.open();
+      gallerySP.open();
       mySwiper.update();
       changeDownloadURL(slideIdx);
     }
   },
   false,
 );
+
+// app.on('mediaChange', () => console.log(app.device));

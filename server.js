@@ -1,28 +1,44 @@
-const express = require('express');
-const port = 3000;
-const server = express().listen(port, () => console.log(`[Server] Listening on https://localhost:${port}`));
-const SocketServer = require('ws').Server;
-const wss = new SocketServer({ server });
+const app = require('express')();
+const http = require('http');
+const server = http.createServer(app);
+const { Server } = require('socket.io');
+const io = new Server(server, {
+  cors: {
+    origin: '*',
+    methods: ['GET', 'POST'],
+  },
+});
 
-// Connection opened
-wss.on('connection', (ws, req) => {
-  ws.id = req.headers['sec-websocket-key'].substring(0, 8);
-  // ws.send(`Client ${ws.id} is connected!`);
-  ws.send('Hello!');
+app.listen(8000, function () {
+  console.log('API listening on *:8000');
+});
+app.get('/', (req, res) => {
+  res.sendFile(__dirname + '/index.html');
+});
+app.get('/api/messages', function (req, res) {
+  let messages = 'hellow world';
+  res.send(messages);
+});
 
-  // Listen for messages from client
-  ws.on('message', data => {
-    console.log(`[Message from client]: ${data}`);
-    // Get clients who has connected
-    let clients = wss.clients;
-    // Use loop for sending messages to each client
-    clients.forEach(client => {
-      client.send(`${ws.id}: ${data}`);
-    });
+io.on('connection', socket => {
+  const username = socket.handshake.query.username;
+  console.log(`${username} connected`);
+  socket.on('disconnect', () => {
+    console.log(`${username} disconnected`);
   });
-
-  // Connection closed
-  ws.on('close', () => {
-    console.log('[Close connected]');
+  socket.on('hello', username => {
+    socket.emit('message', `Hello, ${username}`);
   });
+  socket.on('message', data => {
+    console.log({ id: socket.id, username, data });
+    socket.emit('message', `文字訊息： ${data}`);
+  });
+  socket.on('upload', (data, filetype) => {
+    console.log({ id: socket.id, username, data });
+    socket.emit('message', `收到 ${data.length} ${filetype}`);
+  });
+});
+
+server.listen(3000, () => {
+  console.log('listening on *:3000');
 });

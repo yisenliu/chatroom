@@ -1,120 +1,124 @@
 import './style.sass';
-
-function scrollToNewMsg(firstAddedNode) {
-  window.scrollTo({
-    top: firstAddedNode.getBoundingClientRect().top + document.documentElement.scrollTop,
-    behavior: 'smooth',
-  });
-}
+import { io } from 'socket.io-client';
 
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 
 export default class Chatroom {
-  constructor(id) {
+  constructor({ id, username }) {
+    const closeChatroom = document.querySelector('.chatroom-header-close');
+    const submitTextMsg = event => {
+      const textNode = document.createTextNode(event.target.value);
+      if (event.key === 'Enter') {
+        this.createDialog({ from: 'user', msgType: 'plaintext', data: textNode });
+        this.sendMessage(event.target.value);
+        event.target.value = '';
+      }
+    };
+    const scrollToNewMsg = firstAddedNode => {
+      this.body.scrollTo({
+        top: firstAddedNode.getBoundingClientRect().top + document.documentElement.scrollTop,
+        behavior: 'smooth',
+      });
+    };
+    this.msgInput = document.querySelector('.chatroom-footer-msgInput');
     this.chatroom = document.getElementById(id);
     this.body = this.chatroom.querySelector('.chatroom-body');
-    const closeChatroom = this.chatroom.querySelector('.chatroom-header-close');
-    const msgInput = this.chatroom.querySelector('.chatroom-footer-msgInput');
-    const observer = new MutationObserver(async mutations => {
+    this.observer = new MutationObserver(async mutations => {
       const firstAddedNode = mutations[0].addedNodes[0];
       await delay(200);
       scrollToNewMsg(firstAddedNode);
     });
-    observer.observe(this.body, {
+    this.observer.observe(this.body, {
       subtree: true,
       childList: true,
     });
 
-    msgInput.addEventListener('keypress', event => {
-      if (event.key === 'Enter') {
-        const textNode = document.createTextNode(event.target.value);
-
-        this.createDialog({ from: 'user', msgType: 'plaintext', elements: [textNode] });
-        event.target.value = '';
-      }
-    });
+    this.msgInput.addEventListener('keypress', submitTextMsg);
     closeChatroom.addEventListener('click', this.disconnect.bind(this));
-    this.connect();
-  }
-  connect() {
+
     // Create WebSocket connection
-    this.ws = new WebSocket('ws://localhost:3000');
-
-    this.ws.onopen = () => {
-      console.log('[open connection]');
-
-      // Listen for messages from Server
-      this.ws.addEventListener('message', event => {
-        console.log(`[Message from server]: %c${event.data}`, 'color: blue');
-        this.createDialog({ from: 'assistant', msgType: 'plaintext', elements: [event.data] });
-      });
-    };
-    this.ws.addEventListener('error', event => {
-      console.log('WebSocket error: ', event);
+    this.socket = io('localhost:3000', {
+      query: {
+        username,
+      },
+    });
+    this.socket.on('connect', () => {
+      console.log('socket connected');
+      this.chatroom.classList.add('chatroom--connected');
+    });
+    this.socket.on('disconnect', () => {
+      this.observer.disconnect();
+      this.chatroom.classList.remove('chatroom--connected');
+      this.body.replaceChildren();
+      this.chatroom.classList.remove('chatroom--disconnected');
+      this.msgInput.removeEventListener('keypress', submitTextMsg);
+      console.log('socket disconnected');
+    });
+    this.socket.on('connect_error', error => {
+      console.error('socket error: ', error);
       this.chatroom.classList.add('chatroom--error');
     });
+    this.socket.on('message', data => {
+      this.createDialog({ from: 'assistant', msgType: 'plaintext', data });
+    });
+
+    this.socket.emit('hello', username);
+  }
+  connect() {
+    this.socket.connect();
   }
   disconnect() {
-    this.ws.close();
-    this.ws.addEventListener('close', () => console.log('[close connection]'));
-    this.chatroom.classList.add('chatroom--disconnected');
+    this.socket.disconnect();
   }
-  createDialog({ from, msgType, elements }) {
-    const msg = document.createElement('div');
+  createDialog({ from, msgType, data }) {
+    const dialog = document.createElement('div');
     const content = document.createElement('div');
     const time = document.createElement('time');
 
-    msg.className = `chatroom-dialog ${from}`;
+    dialog.className = `chatroom-dialog ${from}`;
     content.className = `chatroom-dialog-${msgType}`;
     time.textContent = new Intl.DateTimeFormat('zh-Hans-CN', {
       timeZone: 'Asia/Taipei',
       timeStyle: 'short',
       dateStyle: 'short',
     }).format(new Date());
-    content.append(...elements);
-    this.body.appendChild(msg).append(content, time);
-    if (from === 'user') {
-      this.sendMessage(elements);
+    if (msgType === 'plaintext') {
+      content.append(data);
+    } else {
+      content.append(...data);
     }
+    this.body.appendChild(dialog).append(content, time);
   }
-  sendMessage(msg) {
-    this.ws.send(msg);
+  sendMessage(message) {
+    this.socket.emit('message', message);
   }
   uploadFile(files) {
     const imgFiles = Object.values(files).filter(blob => blob.type.includes('image'));
     const videoFiles = Object.values(files).filter(blob => blob.type.includes('video'));
-    const imgContainer = document.createElement('div');
-    const videoContainer = document.createElement('div');
-
-    if (imgFiles) {
+    if (imgFiles.length) {
+      let container = document.createElement('div');
       imgFiles.forEach(blob => {
         const img = new Image();
 
         img.src = URL.createObjectURL(blob);
-        imgContainer.append(img);
+        container.append(img);
       });
-
-      this.createDialog({
-        from: 'user',
-        msgType: 'media',
-        elements: imgContainer.children,
-      });
+      this.createDialog({ from: 'user', msgType: 'attachment', data: container.children });
+      this.socket.emit('upload', imgFiles, 'image');
     }
-    if (videoFiles) {
+    if (videoFiles.length) {
       videoFiles.forEach(blob => {
+        let container = document.createElement('div');
         const video = document.createElement('video');
         const source = document.createElement('source');
 
         source.src = window.URL.createObjectURL(blob);
         source.type = blob.type;
         video.controls = true;
-        videoContainer.appendChild(video).append(source);
-        this.createDialog({
-          from: 'user',
-          msgType: 'media',
-          elements: videoContainer.children,
-        });
+        container.appendChild(video).append(source);
+        this.createDialog({ from: 'user', msgType: 'attachment', data: container.children });
       });
+      this.socket.emit('upload', videoFiles, 'video');
     }
   }
 }
