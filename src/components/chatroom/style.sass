@@ -58,6 +58,7 @@
       $bg: var(--chatroom-user-bg,theme('colors.blue.100'))
       background-color: $bg
       color: var(--chatroom-user-color, #000)
+      word-break: break-word
       &::before
         @apply absolute z-1 left-full top-3 w-0 h-0 -skew-y-12
         content: ''
@@ -68,12 +69,12 @@
     @apply flex items-center px-4 py-2 bg-blueGray-100 fixed z-1 w-full h-15 left-0 bottom-0
     background-color: var(--chatroom-footer-bg,theme('colors.blueGray.100'))
     &-label
-      @apply w-12 h-12 flex justify-center items-center -ml-4
+      @apply w-12 h-12 flex justify-center items-center -ml-4 cursor-pointer
       &::before
         +md-icon(attach_file)
         @apply text-2xl leading-none
       input
-        @apply hidden      
+        @apply hidden
     &-msgInput
       @apply flex-1
       @apply py-2 border-none rounded-full focus:ring-0 focus:shadow-none #{!important}

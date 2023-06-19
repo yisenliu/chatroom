@@ -1,7 +1,4 @@
 import '@sass/pages/index.sass';
-import '@assets/static/gallery-1.jpg';
-import '@assets/static/gallery-2.jpg';
-import '@assets/static/gallery-3.jpg';
 import Chatroom from '@components/chatroom';
 import SlidePage from '@components/slidePage';
 import Swiper, { Navigation, Pagination, Zoom } from 'swiper';
@@ -10,7 +7,6 @@ import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import 'swiper/css/zoom';
 
-// console.log(process.env.OPENAI_APIKEY);
 let myChatroom;
 // portal
 const user = document.querySelector('.portal input');
@@ -29,12 +25,6 @@ user.addEventListener('keydown', event => {
 });
 
 const gallerySP = new SlidePage('gallerySP');
-
-// 檔案上傳
-const fileUploader = document.getElementById('fileUploader');
-fileUploader.addEventListener('change', e => {
-  myChatroom.uploadFile(e.target.files);
-});
 
 // 圖片輪播與下載 (https://swiperjs.com/swiper-api)
 let mySwiper = null;
@@ -101,13 +91,13 @@ chatroomBody.addEventListener(
   'click',
   event => {
     if (event.target !== event.currentTarget && event.target.tagName === 'IMG') {
-      const self = event.target;
-      const mediaElements = Array.from(self.closest('.chatroom-dialog-media').children);
+      const target = event.target;
+      const mediaElements = Array.from(target.closest('.chatroom-dialog-attachment').children);
       if (mySwiper) {
         destroySwiper();
       }
       mySwiper = createSwiper(mediaElements);
-      slideIdx = mediaElements.indexOf(self);
+      slideIdx = mediaElements.indexOf(target);
       gallerySP.open();
       mySwiper.update();
       changeDownloadURL(slideIdx);

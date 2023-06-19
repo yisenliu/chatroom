@@ -32,8 +32,8 @@ module.exports = () => {
       jquery: 'jQuery',
     },
     plugins: [
-      plugins.Dotenv(),
-      plugins.DefinePlugin(),
+      // plugins.Dotenv(),
+      // plugins.DefinePlugin(),
       plugins.EnvironmentPlugin(),
       plugins.WebpackProvidePlugin(),
       new MiniCssExtractPlugin({

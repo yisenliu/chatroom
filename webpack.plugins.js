@@ -29,7 +29,7 @@ const plugins = {
     // 建議透過 JSON.stringify() 來完成予值, 直接使用 KEY 取得變數值
     return new webpack.DefinePlugin({
       API_URL: JSON.stringify('http://localhost:3000'),
-      isDev,
+      development: isDev,
     });
   },
   EnvironmentPlugin: () => {
