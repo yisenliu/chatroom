@@ -1,6 +1,6 @@
 import './style.sass';
 import { io } from 'socket.io-client';
-import fileType from './fileType';
+import fileUpload from './fileUpload';
 
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -63,16 +63,28 @@ export default class Chatroom {
     this.socket.io.on('reconnect', attempt => {
       console.log(`socket reconnected ${attempt}`);
       this.socket.emit('reconnect', username);
+      this.observer.observe(this.body, {
+        subtree: true,
+        childList: true,
+      });
+      this.msgInput.addEventListener('keypress', submitTextMsg);
+      fileInput.el.addEventListener('click', fileInput.reset);
+      fileInput.el.addEventListener('change', fileInput.upload);
+    });
+    this.socket.io.on('error', error => {
+      this.chatroom.classList.add('chatroom--error');
     });
     this.socket.on('connect', () => {
       console.log('socket connected');
+      this.chatroom.classList.remove('chatroom--error');
+      this.chatroom.classList.remove('chatroom--disconnected');
       this.chatroom.classList.add('chatroom--connected');
     });
     this.socket.on('disconnect', () => {
       this.observer.disconnect();
       this.chatroom.classList.remove('chatroom--connected');
       this.body.replaceChildren();
-      this.chatroom.classList.remove('chatroom--disconnected');
+      this.chatroom.classList.add('chatroom--disconnected');
       this.msgInput.removeEventListener('keypress', submitTextMsg);
       fileInput.el.removeEventListener('click', fileInput.reset);
       fileInput.el.removeEventListener('change', fileInput.upload);
@@ -124,114 +136,42 @@ export default class Chatroom {
       alert('請選擇檔案');
     } else {
       if (imgFiles.length) {
-        const imgMap = imgFiles.map(file => {
-          return new Promise((resolve, reject) => {
-            const readerBuffer = new FileReader();
-            const readerBase64 = new FileReader();
-            const segmentSize = 512 * 1024; // 分段上傳，每段512kb
-            const totalSegments = Math.ceil(file.size / segmentSize);
-            let currentSegment = 0;
-            const readNextSegment = () => {
-              const start = currentSegment * segmentSize;
-              const end = Math.min(start + segmentSize, file.size);
-              const fileSegment = file.slice(start, end);
-              readerBase64.readAsDataURL(fileSegment);
-            };
+        const imgMap = imgFiles.map(file =>
+          fileUpload({
+            file,
+            onSuccess(resolve, socket) {
+              const reader = new FileReader();
 
-            readerBuffer.onload = e => {
-              const filetype = fileType(e.target.result);
-              if (['jpg', 'gif', 'png'].includes(filetype)) {
-                readNextSegment();
-              } else {
-                reject(`${file.name} is invalid.`);
-              }
-            };
-            readerBase64.onload = e => {
-              const fileContent = e.target.result;
+              reader.onload = e => {
+                const img = new Image();
 
-              currentSegment++;
-              this.socket.emit('fileUpload', {
-                fileName: file.name,
-                fileContent,
-                currentSegment,
-                totalSegments,
-              });
-              if (currentSegment === totalSegments) {
-                const reader = new FileReader();
-
-                reader.onload = e => {
-                  const img = new Image();
-
-                  img.src = e.target.result;
-                  resolve(img);
-                  this.socket.emit('uploadResult', {
-                    success: true,
-                    fileName: file.name,
-                    fileSize: file.size,
-                  });
-                };
-                reader.readAsDataURL(file);
-              } else {
-                readNextSegment();
-              }
-            };
-            readerBase64.onerror = () => {
-              this.socket.emit('uploadResult', {
-                success: false,
-                message: `Something wrong on ${file.name}`,
-              });
-            };
-            readerBuffer.readAsArrayBuffer(file);
-          });
-        });
+                img.src = e.target.result;
+                resolve(img);
+                socket.emit('uploadResult', {
+                  success: true,
+                  fileName: file.name,
+                  fileSize: file.size,
+                });
+              };
+              reader.readAsDataURL(file);
+            },
+            socket: this.socket,
+            supportTypes: ['jpg', 'gif', 'png'],
+          }),
+        );
         Promise.all(imgMap)
           .then(imgs => {
             this.createDialog({ from: 'user', msgType: 'attachment', data: imgs });
           })
           .catch(reason => {
-            console.error(reason);
             this.createDialog({ from: 'assistant', msgType: 'plaintext', data: reason });
           });
       }
       if (videoFiles.length) {
         videoFiles.forEach(file => {
-          const readerBuffer = new FileReader();
-          const readerBase64 = new FileReader();
-          const segmentSize = 512 * 1024;
-          const totalSegments = Math.ceil(file.size / segmentSize);
-          let currentSegment = 0;
-          const readNextSegment = () => {
-            const start = currentSegment * segmentSize;
-            const end = Math.min(start + segmentSize, file.size);
-            const fileSegment = file.slice(start, end);
-            readerBase64.readAsDataURL(fileSegment);
-          };
-
-          readerBuffer.onload = e => {
-            const fileContent = e.target.result;
-            const filetype = fileType(fileContent);
-
-            if (['mp4', 'ogg'].includes(filetype)) {
-              readNextSegment();
-            } else {
-              this.createDialog({
-                from: 'assistant',
-                msgType: 'plaintext',
-                data: `${file.name} is invalid.`,
-              });
-            }
-          };
-          readerBase64.onload = e => {
-            const fileContent = e.target.result;
-
-            currentSegment++;
-            this.socket.emit('fileUpload', {
-              fileName: file.name,
-              fileContent,
-              currentSegment,
-              totalSegments,
-            });
-            if (currentSegment === totalSegments) {
+          fileUpload({
+            file,
+            onSuccess: function (resolve, socket) {
               const video = document.createElement('video');
               const source = document.createElement('source');
 
@@ -239,24 +179,23 @@ export default class Chatroom {
               source.type = file.type;
               video.controls = true;
               video.append(source);
-              video.onload = () => URL.revokeObjectURL(source.src);
-              this.createDialog({ from: 'user', msgType: 'attachment', data: [video] });
-              this.socket.emit('uploadResult', {
+              video.onload = () => {
+                URL.revokeObjectURL(source.src);
+              };
+              socket.emit('uploadResult', {
                 success: true,
                 fileName: file.name,
                 fileSize: file.size,
               });
-            } else {
-              readNextSegment();
-            }
-          };
-          readerBase64.onerror = () => {
-            this.socket.emit('uploadResult', {
-              success: false,
-              message: `Something wrong on ${file.name}`,
+              resolve(video);
+            },
+            socket: this.socket,
+            supportTypes: ['mp4', 'ogg'],
+          })
+            .then(video => this.createDialog({ from: 'user', msgType: 'attachment', data: [video] }))
+            .catch(reason => {
+              this.createDialog({ from: 'assistant', msgType: 'plaintext', data: reason });
             });
-          };
-          readerBuffer.readAsArrayBuffer(file);
         });
       }
     }

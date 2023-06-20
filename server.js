@@ -23,6 +23,10 @@ app.get('/api/messages', function (req, res) {
 io.on('connection', socket => {
   const username = socket.handshake.query.username;
   console.log(`${username} connected`);
+  socket.on('error', error => {
+    console.error('發生錯誤:', error);
+    socket.emit('message', error);
+  });
   socket.on('disconnect', () => {
     console.log(`${username} disconnected`);
   });
